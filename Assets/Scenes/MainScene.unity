@@ -3124,6 +3124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameCurrentState: 0
   uiManager: {fileID: 1858928635}
+  dataManager: {fileID: 0}
 --- !u!114 &1858928635
 MonoBehaviour:
   m_ObjectHideFlags: 0
