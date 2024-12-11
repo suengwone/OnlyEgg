@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a660df5438114d9fa30c17b9c1b951d, type: 3}
+  m_Name: ActionValue
+  m_EditorClassIdentifier: 
+  eatValue:
+    fatigue: 1
+    energy: 1
+    experience: 0
+  sleepValue:
+    fatigue: -1
+    energy: 1
+    experience: 0
+  exerciseValue:
+    fatigue: 1
+    energy: -1
+    experience: 1
+  toiletValue:
+    fatigue: 1
+    energy: -1
+    experience: 1
