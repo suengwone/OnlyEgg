@@ -3088,6 +3088,7 @@ GameObject:
   - component: {fileID: 1858928633}
   - component: {fileID: 1858928634}
   - component: {fileID: 1858928635}
+  - component: {fileID: 1858928636}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -3122,9 +3123,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c619b269fc804b68a02fdb0048c2c1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameCurrentState: 0
   uiManager: {fileID: 1858928635}
-  dataManager: {fileID: 0}
+  dataManager: {fileID: 1858928636}
 --- !u!114 &1858928635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3140,6 +3140,18 @@ MonoBehaviour:
   stateTitle: {fileID: 717052272}
   stateValue: {fileID: 913907489}
   eggButton: {fileID: 19367523}
+--- !u!114 &1858928636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1858928632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d36c1fe4a8c845f79e127e5a4bbeafb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1938674300
 GameObject:
   m_ObjectHideFlags: 0

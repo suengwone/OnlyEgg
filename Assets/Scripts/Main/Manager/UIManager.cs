@@ -7,6 +7,13 @@ using System;
 
 public class UIManager : BaseMonoBehaviour, IUI
 {
+    private IGame gameManager;
+
+    public IGame GameManager
+    {
+        get => gameManager;
+    }
+
     [SerializeField]
     private TMP_Text stateTitle;
     private StringBuilder stateTitleText;
@@ -18,26 +25,20 @@ public class UIManager : BaseMonoBehaviour, IUI
     [SerializeField]
     private Button eggButton;
 
-    private IGame gameManager;
-
-    public IGame GameManager
-    {
-        get => gameManager;
-    }
-
 
     void IManager.Initialize()
     {
-        throw new NotImplementedException();
-    }
-
-    public void Init(IGame gameManager)
-    {
-        this.gameManager = gameManager;
-
         stateTitleText = new ("");
         stateValueText = new ("");
     }
+
+    // public void Init(IGame gameManager)
+    // {
+    //     this.gameManager = gameManager;
+
+    //     stateTitleText = new ("");
+    //     stateValueText = new ("");
+    // }
 
     public void SetEventOnClickEgg(Action onClick)
     {

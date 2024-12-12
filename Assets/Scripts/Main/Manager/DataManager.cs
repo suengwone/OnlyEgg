@@ -1,22 +1,63 @@
 using EnumTypes;
 using Globals;
 using System;
+using UnityEngine;
 using Time = Utils.Time;
 
-public class DataManager : DataProcess, IData
+public class DataManager : DataProcess
 {
+#region Variable
     private IGame gameManager;
 
-    public IGame GameManager => gameManager;
-
+    [SerializeField]
     private GameCurrentState gameCurrentState;
+
+    [SerializeField]
+    private EggTypes eggType;
+    public EggTypes EggType => eggType;
+
+    [SerializeField]
+    private ActionData actionDataValue;
 
     public DateTime CurrentTime => Time.GetCurrent();
     private DateTime processEndTime;
     public TimeSpan GapTime => Time.GetGapTime(processEndTime);
 
-    private EggTypes eggType;
-    public EggTypes EggType => eggType;
+    private bool isPaused;
+    public bool IsPaused => isPaused;
+
+#endregion
+
+#region Monster Value
+    public TextData<float> fatigue;
+
+    public TextData<float> energy;
+
+    public TextData<float> experience;
+#endregion
+
+#region Method
+    public async override void Initialize()
+    {
+        gameCurrentState = GameCurrentState.Play;
+
+        // Load Data
+        var initDataPath = Constants.CacheDataFilePath + "init" + Constants.CacheFileExtesion;
+        var initData = await Laod<LoadData>(initDataPath);
+
+        initData ??= Resources.Load<LoadData>("TextValue/InitialValue");
+
+        this.eggType = initData.eggType;
+
+        actionDataValue = Resources.Load<ActionData>("TextValue/ActionValue");
+    }
+
+    // public void Init(IGame gameManager)
+    // {
+    //     gameCurrentState = GameCurrentState.Play;
+    //     this.gameManager = gameManager;
+    // }
+
     public void SetEggType(EggTypes eggType, Action onChange)
     {
         if (this.eggType != eggType)
@@ -35,9 +76,6 @@ public class DataManager : DataProcess, IData
         processEndTime.AddSeconds(second);
     }
 
-    private bool isPaused;
-    public bool IsPaused => isPaused;
-
     public void SetPause(bool isPaused)
     {
         this.isPaused = isPaused;
@@ -51,17 +89,25 @@ public class DataManager : DataProcess, IData
             gameCurrentState = GameCurrentState.Play;
         }
     }
+#endregion
+}
 
-    public void Init(IGame gameManager)
+public class TextData<T>
+{
+    private Action<string> callback;
+    public void SetUpCallback(Action<string> callback)
     {
-        gameCurrentState = GameCurrentState.Play;
-        this.gameManager = gameManager;
+        this.callback = callback;
     }
 
-    async void IManager.Initialize()
+    private T text;
+    public string Text
     {
-        var initDataPath = Constants.CacheDataFilePath + "" + Constants.CacheFileExtesion;
-
-        var initData = await Laod<LoadData>(initDataPath);
+        get => text.ToString();
+        set
+        {
+            text = (T)Convert.ChangeType(value, typeof(T));
+            callback.Invoke(value);
+        }
     }
 }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfed09d003a074852a7059c8a58c213d, type: 3}
   m_Name: InitialValue
   m_EditorClassIdentifier: 
-  eggType: 0
+  eggType: 1
   fatigue: 0
   recoveryTimePerFatigue: 1
   maxEnergy: 100

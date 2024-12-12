@@ -21,4 +21,10 @@ namespace EnumTypes
         Pause,
         Quit,
     }
+
+    public enum NotifyType
+    {
+        UI,
+        Data,
+    }
 }
