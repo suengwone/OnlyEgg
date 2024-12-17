@@ -1,9 +1,9 @@
 using UnityEngine;
-using EnumTypes;
-using System.Text;
-using TMPro;
 using UnityEngine.UI;
+using EnumTypes;
+using TMPro;
 using System;
+using System.Collections;
 
 public class UIManager : BaseMonoBehaviour, IUI
 {
@@ -16,85 +16,84 @@ public class UIManager : BaseMonoBehaviour, IUI
 
     [SerializeField]
     private TMP_Text stateTitle;
-    private StringBuilder stateTitleText;
 
     [SerializeField]
     private TMP_Text stateValue;
-    private StringBuilder stateValueText;
 
     [SerializeField]
+    private TMP_Text fatigueText;
+    public TMP_Text FatigueText => fatigueText;
+
+    [SerializeField]
+    private TMP_Text energyText;
+    public TMP_Text EnergyText => energyText;
+
+    [SerializeField]
+    private TMP_Text experienceText;
+    public TMP_Text ExperienceText => experienceText;
+
+#region User Action Button
+    [SerializeField]
     private Button eggButton;
+
+    [SerializeField]
+    private Button foodButton;
+    public Button FoodButton => foodButton;
+
+    [SerializeField]
+    private Button exerciseButton;
+    public Button ExerciseButton => exerciseButton;
+
+    [SerializeField]
+    private Button poopButton;
+    public Button PoopButton => poopButton;
+
+    [SerializeField]
+    private Button sleepButton;
+    public Button SleepButton => sleepButton;
+#endregion
 
 
     void IManager.Initialize()
     {
-        stateTitleText = new ("");
-        stateValueText = new ("");
+        
     }
 
-    // public void Init(IGame gameManager)
-    // {
-    //     this.gameManager = gameManager;
-
-    //     stateTitleText = new ("");
-    //     stateValueText = new ("");
-    // }
-
-    public void SetEventOnClickEgg(Action onClick)
+    public void SetEventOnClickEgg(Action OnClick)
     {
-        eggButton.onClick.RemoveAllListeners();
-        eggButton.onClick.AddListener(() => 
-        {
-            onClick?.Invoke();
-        });
-
+        eggButton.onClick.AddListener(() => OnClick?.Invoke() );
     }
 
     public void SetState(EggTypes state, Action onChangeState)
     {
-        stateTitleText?.Clear();
-        stateValueText?.Clear();
-
         switch(state)
         {
             case EggTypes.None:
-                stateTitleText.Insert(0, "Nothing");
-                stateValueText.Insert(0, "to do");
+                stateTitle.text = "Nothing";
+                stateValue.text = "to do";
                 break;
             case EggTypes.Hatching:
-                stateTitleText.Insert(0, "Time :");
-                stateValueText.Insert(0, "04 : 00 : 00");
-                UpdateTime(4, 0, 0);
+                stateTitle.text = "Time : ";
+                UpdateTime(6, 0, 0);
                 onChangeState?.Invoke();
                 break;
             case EggTypes.Sleep:
-                stateTitleText.Insert(0, "Sleep :");
-                stateValueText.Insert(0, "06 : 00 : 00");
-                UpdateTime(6, 0, 0);
-                onChangeState?.Invoke();
+                stateTitle.text = "Sleep";
+                stateValue.text = "Z Z Z";
                 break;
             default:
                 break;
         }
-
-        stateTitle.text = stateTitleText.ToString();
-        stateValue.text = stateValueText.ToString();
     }
 
-    void IUI.Hide()
+    public void UpdateTime(TimeSpan? timeSpan)
     {
-        throw new NotImplementedException();
+        stateValue.text = timeSpan == TimeSpan.Zero ? 
+            "" :
+            $"{timeSpan?.Hours:D2} : {timeSpan?.Minutes:D2} : {timeSpan?.Seconds:D2}";
     }
-
-    void IUI.Show()
-    {
-        throw new NotImplementedException();
-    }
-
     private void UpdateTime(int hour, int minute, int second)
     {
-        stateValueText.Clear();
-        stateValueText.Insert(0, string.Format("{0:D2} : {1:D2} : {2:D2}", hour, minute, second));
-        stateValue.text = stateValueText.ToString();
+        stateValue.text = $"{hour:D2} : {minute:D2} : {second:D2}";
     }
 }
