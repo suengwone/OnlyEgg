@@ -1,5 +1,5 @@
 using UnityEngine;
-using EnumTypes;
+using Time = Utils.Time;
 
 public class GameManager : BaseMonoBehaviour, IGame
 {
@@ -9,6 +9,9 @@ public class GameManager : BaseMonoBehaviour, IGame
     [SerializeField]
     private DataManager dataManager;
 
+    [SerializeField]
+    private TimeManager timeManager;
+
     private void Start()
     {
         (this as IManager).Initialize();
@@ -16,8 +19,7 @@ public class GameManager : BaseMonoBehaviour, IGame
 
     void IManager.Initialize()
     {
-        // uiManager.Init(this);
-        // dataManager.Init(this);
+        dataManager.SetupUIBindings(uiManager);
 
         (uiManager as IManager).Initialize();
         (dataManager as IManager).Initialize();
@@ -25,40 +27,30 @@ public class GameManager : BaseMonoBehaviour, IGame
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        if (pauseStatus)
-        {
-            dataManager.SetPause(true);
+        dataManager.IsPause.Value = pauseStatus;
 
-            var pauseTimeStamp = dataManager.CurrentTime;
+        // if (pauseStatus)
+        // {
+        //     dataManager.SetPause(true);
 
-            Debug.Log($"Paues Time : {pauseTimeStamp.Hour:D2} : {pauseTimeStamp.Minute:D2} : {pauseTimeStamp.Second:D2}");
-        }
-        else
-        {
-            if (dataManager.IsPaused)
-            {
-                dataManager.SetPause(false);
+        //     var pauseTimeStamp = Time.GetCurrent();
 
-                var gap = dataManager.GapTime;
+        //     Debug.Log($"Paues Time : {pauseTimeStamp.Hour:D2} : {pauseTimeStamp.Minute:D2} : {pauseTimeStamp.Second:D2}");
 
-                Debug.Log(string.Format($"Gap Time : {gap.Hours:D2} : {gap.Minutes:D2} : {gap.Seconds:D2}"));
-            }
-        }
-    }
+        //     timeManager.PauseGame();
+        // }
+        // else
+        // {
+        //     if (dataManager.IsPaused)
+        //     {
+        //         dataManager.SetPause(false);
 
-    public void Notify(NotifyType notifyType, string message)
-    {
-        switch (notifyType)
-        {
-            case NotifyType.Data:
-            {
-                var datas = message.Split(':');
-                break;
-            }
-            case NotifyType.UI:
-            {
-                break;
-            }
-        }
+        //         var gap = dataManager.GapTime;
+
+        //         Debug.Log(string.Format($"Gap Time : {gap.Hours:D2} : {gap.Minutes:D2} : {gap.Seconds:D2}"));
+
+        //         timeManager.ResumeGame();
+        //     }
+        // }
     }
 }
