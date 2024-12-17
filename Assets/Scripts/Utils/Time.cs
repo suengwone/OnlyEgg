@@ -4,12 +4,11 @@ namespace Utils
 {
     public static class Time
     {
+        public static readonly TimeSpan OneSecond = new TimeSpan(0, 0, 1);
         // 현재 시간 가져오기 (추후 서버 시간 가져오기)
         public static DateTime GetCurrent()
         {
-            DateTime current = new DateTime();
-
-            return current;
+            return DateTime.Now;
         }
 
         // 남은 시간 계산 (현재시간 기준)
