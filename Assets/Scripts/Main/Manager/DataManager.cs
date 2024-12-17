@@ -1,9 +1,13 @@
 using EnumTypes;
 using Globals;
 using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using Time = Utils.Time;
 
+// TODO
+// Data Binding to UI
 public class DataManager : DataProcess
 {
 #region Variable
@@ -13,27 +17,23 @@ public class DataManager : DataProcess
     private GameCurrentState gameCurrentState;
 
     [SerializeField]
-    private EggTypes eggType;
-    public EggTypes EggType => eggType;
-
-    [SerializeField]
     private ActionData actionDataValue;
+    public ActionData ActionDataValue { get => actionDataValue; }
 
-    public DateTime CurrentTime => Time.GetCurrent();
     private DateTime processEndTime;
     public TimeSpan GapTime => Time.GetGapTime(processEndTime);
-
-    private bool isPaused;
-    public bool IsPaused => isPaused;
-
 #endregion
 
 #region Monster Value
-    public TextData<float> fatigue;
+    public BindableProperty<float> Fatigue { get; } = new BindableProperty<float>();
+    
+    public BindableProperty<float> Energy { get; } = new BindableProperty<float>();
 
-    public TextData<float> energy;
+    public BindableProperty<float> Experience { get; } = new BindableProperty<float>();
 
-    public TextData<float> experience;
+    public BindableProperty<EggTypes> EggType { get; } = new BindableProperty<EggTypes>();
+
+    public BindableProperty<bool> IsPause { get; } = new BindableProperty<bool>();
 #endregion
 
 #region Method
@@ -47,67 +47,115 @@ public class DataManager : DataProcess
 
         initData ??= Resources.Load<LoadData>("TextValue/InitialValue");
 
-        this.eggType = initData.eggType;
+        EggType.Value = initData.eggType;
+
+        if (EggType.Value == EggTypes.Hatching)
+        {
+            var hatchingTime = Resources.Load<TimeSettings>("TextValue/HatchingTime");
+            processEndTime = Time.GetCurrent() + hatchingTime.processTimeSpan;
+
+            StartCoroutine(FlowTime());
+        }
+
+        Fatigue.Value = initData.fatigue;
+        Energy.Value = initData.energy;
+        Experience.Value = initData.experience;
+    }
+
+    public void SetupUIBindings(UIManager uiManagerRef)
+    {
+        Fatigue.BindTo(value => uiManagerRef.FatigueText.text = value.ToString());
+        Energy.BindTo(value => uiManagerRef.EnergyText.text = value.ToString());
+        Experience.BindTo(value => uiManagerRef.ExperienceText.text = value.ToString());
+
+        EggType.BindTo(value => 
+        {
+            uiManagerRef.SetState(value, null);
+        });
+
+        uiManagerRef.SetEventOnClickEgg(() => 
+        {
+            if (EggType.Value == EggTypes.Hatching)
+            {
+                processEndTime -= Time.OneSecond;
+
+                TimeUpdate?.Invoke(processEndTime - Time.GetCurrent());
+            }
+        });
 
         actionDataValue = Resources.Load<ActionData>("TextValue/ActionValue");
+
+        uiManagerRef.FoodButton.onClick.AddListener(() => 
+        {
+            Fatigue.Value += actionDataValue.foodValue.fatigue;
+            Energy.Value += actionDataValue.foodValue.energy;
+            Experience.Value += actionDataValue.foodValue.experience;
+        });
+
+        uiManagerRef.ExerciseButton.onClick.AddListener(() => 
+        {
+            Fatigue.Value += actionDataValue.exerciseValue.fatigue;
+            Energy.Value += actionDataValue.exerciseValue.energy;
+            Experience.Value += actionDataValue.exerciseValue.experience;
+        });
+
+        uiManagerRef.PoopButton.onClick.AddListener(() => 
+        {
+            Fatigue.Value += actionDataValue.poopValue.fatigue;
+            Energy.Value += actionDataValue.poopValue.energy;
+            Experience.Value += actionDataValue.poopValue.experience;   
+        });
+
+        uiManagerRef.SleepButton.onClick.AddListener(() => 
+        {
+            Fatigue.Value += actionDataValue.sleepValue.fatigue;
+            Energy.Value += actionDataValue.sleepValue.energy;
+            Experience.Value += actionDataValue.sleepValue.experience;
+
+            EggType.Value = EggTypes.Sleep;
+        });
+
+        TimeUpdate = (timeSpan) => uiManagerRef.UpdateTime(timeSpan);
     }
 
-    // public void Init(IGame gameManager)
+    private Action<TimeSpan> TimeUpdate;
+    private IEnumerator FlowTime()
+    {
+        WaitForSecondsRealtime waitForSecondRealtime = new WaitForSecondsRealtime(1);
+
+        while (true)
+        {
+            yield return waitForSecondRealtime;
+            
+            var remainTime = processEndTime - Time.GetCurrent();
+
+            if (remainTime <= TimeSpan.Zero)
+            {
+                EggType.Value = EggTypes.None;
+                
+                // Switch Egg Image to Monster Image
+
+                yield break;
+            }
+            else
+            {
+                TimeUpdate?.Invoke(remainTime);
+            }
+        }
+    }
+
+    // public void SetPause(bool isPaused)
     // {
-    //     gameCurrentState = GameCurrentState.Play;
-    //     this.gameManager = gameManager;
+    //     this.isPaused = isPaused;
+
+    //     if (this.isPaused)
+    //     {
+    //         gameCurrentState = GameCurrentState.Pause;
+    //     }
+    //     else
+    //     {
+    //         gameCurrentState = GameCurrentState.Play;
+    //     }
     // }
-
-    public void SetEggType(EggTypes eggType, Action onChange)
-    {
-        if (this.eggType != eggType)
-        {
-            this.eggType = eggType;
-            onChange?.Invoke();
-        }
-    }
-
-    public void SetProcessEndTime(int hour, int minute, int second)
-    {
-        processEndTime = Time.GetCurrent();
-
-        processEndTime.AddHours(hour);
-        processEndTime.AddMinutes(minute);
-        processEndTime.AddSeconds(second);
-    }
-
-    public void SetPause(bool isPaused)
-    {
-        this.isPaused = isPaused;
-
-        if (this.isPaused)
-        {
-            gameCurrentState = GameCurrentState.Pause;
-        }
-        else
-        {
-            gameCurrentState = GameCurrentState.Play;
-        }
-    }
 #endregion
-}
-
-public class TextData<T>
-{
-    private Action<string> callback;
-    public void SetUpCallback(Action<string> callback)
-    {
-        this.callback = callback;
-    }
-
-    private T text;
-    public string Text
-    {
-        get => text.ToString();
-        set
-        {
-            text = (T)Convert.ChangeType(value, typeof(T));
-            callback.Invoke(value);
-        }
-    }
 }
