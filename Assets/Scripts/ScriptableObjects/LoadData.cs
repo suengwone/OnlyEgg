@@ -20,5 +20,5 @@ public class LoadData : ScriptableObject
     public float energy;
 
     public int level;
-    public float exp;
+    public float experience;
 }

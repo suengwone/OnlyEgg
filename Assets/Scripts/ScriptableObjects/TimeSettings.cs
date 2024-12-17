@@ -4,10 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Settings", menuName = "Scriptable Objects/TimeSettings")]
 public class TimeSettings : ScriptableObject
 {
+    [SerializeField]
     public TimeHMS processTime;
 
-    public DateTime standardDateTime = DateTime.Now;
-    public TimeHMS standardTimeHMS = new TimeHMS(DateTime.Now);
+    public TimeSpan processTimeSpan => new TimeSpan(processTime.hour, processTime.minute, processTime.second);
 }
 
 [Serializable]
